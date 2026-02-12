@@ -14,31 +14,24 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "all fields required" });
     }
     // check supplier data
-    if (!supplierID) {
-      if (!supplierName) {
-        return res.status(400).json({ message: "Supplier Name is required" });
-      }
-      // get supplier id by name
-      const [suppliers] = await db.execute(
-        "SELECT SupplierID FROM suppliers WHERE SupplierName = ?",
-        [supplierName]
-      );
-      if (suppliers.length === 0) {
-        return res.status(400).json({
-          message: "Supplier name not found",
-        });
-      }
-      supplierID = suppliers[0].SupplierID;
-    }
-    const [suppliers] = await db.execute(
-      "SELECT * FROM suppliers WHERE SupplierID = ?",
-      [supplierID]
-    );
-    if (suppliers.length === 0) {
+    if (!supplierID && !supplierName) {
       return res.status(400).json({
-        message: "Supplier id not found",
+        message: "SupplierID or SupplierName required",
       });
     }
+
+    const [suppliers] = await db.execute(
+      "SELECT SupplierID FROM suppliers WHERE SupplierID = ? OR SupplierName = ?",
+      [supplierID || null, supplierName || null]
+    );
+
+    if (suppliers.length === 0) {
+      return res.status(400).json({
+        message: "Supplier not found",
+      });
+    }
+
+    supplierID = suppliers[0].SupplierID;
 
     const result = await db.execute(
       "INSERT INTO products (ProductName, price,StockQuantity,SupplierID) VALUES (?, ?, ?,?)",
