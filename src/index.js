@@ -1,7 +1,6 @@
 const express = require("express");
 const { connectDB } = require("./db/connection");
-const { suppliersRoutes } = require("./routes/suppliers.routes");
-const { productsRoutes } = require("./routes/products.routes");
+const { suppliersRoutes, productsRoutes, salesRoutes } = require("./routes");
 
 const app = express();
 connectDB();
@@ -11,6 +10,7 @@ app.use(express.json());
 // Routes
 app.use("/suppliers", suppliersRoutes);
 app.use("/products", productsRoutes);
+app.use("/sales", salesRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
